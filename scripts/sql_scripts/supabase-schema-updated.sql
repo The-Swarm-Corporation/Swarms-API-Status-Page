@@ -153,11 +153,23 @@ INSERT INTO status_checks (timestamp, endpoint_path, endpoint_name, status, resp
 VALUES 
     (NOW(), '/health', 'API Health Check', 'operational', 150, 200, NULL),
     (NOW() - INTERVAL '1 hour', '/health', 'API Health Check', 'operational', 180, 200, NULL),
-    (NOW() - INTERVAL '2 hours', '/v1/swarm/completions', 'Swarm Completions', 'operational', 2500, 200, NULL)
+    (NOW() - INTERVAL '2 hours', '/v1/swarm/completions', 'Swarm Completions', 'operational', 2500, 200, NULL),
+    (NOW() - INTERVAL '2 hours', '/v1/swarm/batch/completions', 'Swarm Batch Completions', 'operational', 5247, 200, NULL),
+    (NOW() - INTERVAL '2 hours', '/v1/agent/completions', 'Agent Completions', 'operational', 2439, 200, NULL),
+    (NOW() - INTERVAL '2 hours', '/v1/agent/batch/completions', 'Agent Batch Completions', 'operational', 5004, 200, NULL),
+    (NOW() - INTERVAL '2 hours', '/v1/models/available', 'Available Models', 'operational', 755, 200, NULL),
+    (NOW() - INTERVAL '2 hours', '/v1/swarms/available', 'Available Swarms', 'operational', 3538, 200, NULL),
+    (NOW() - INTERVAL '2 hours', '/v1/swarm/logs', 'Swarm Logs', 'operational', 980, 200, NULL)
 ON CONFLICT DO NOTHING;
 
 -- Calculate initial daily metrics for today
 SELECT calculate_daily_metrics(CURRENT_DATE, '/health');
 SELECT calculate_daily_metrics(CURRENT_DATE, '/v1/swarm/completions');
+SELECT calculate_daily_metrics(CURRENT_DATE, '/v1/swarm/batch/completions');
+SELECT calculate_daily_metrics(CURRENT_DATE, '/v1/agent/completions');
+SELECT calculate_daily_metrics(CURRENT_DATE, '/v1/agent/batch/completions');
+SELECT calculate_daily_metrics(CURRENT_DATE, '/v1/models/available');
+SELECT calculate_daily_metrics(CURRENT_DATE, '/v1/swarms/available');
+SELECT calculate_daily_metrics(CURRENT_DATE, '/v1/swarm/logs');
 
 COMMIT;
