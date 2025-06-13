@@ -1,4 +1,10 @@
-import { supabase, isSupabaseAvailable, type StatusCheck, type DailyMetrics } from "./supabase"
+import { supabase, isSupabaseAvailable, type StatusCheck, type DailyMetrics, type PerformanceMetrics, type RequestLog } from "./supabase"
+
+interface SystemResourceUsage {
+  timestamp: string
+  memory_usage_mb: number
+  cpu_usage_percent: number
+}
 
 export class SupabaseService {
   // Get latest status for all endpoints
@@ -272,9 +278,12 @@ export class SupabaseService {
       const endpoints = [
         "/health",
         "/v1/swarm/completions",
+        "/v1/swarm/batch/completions",
         "/v1/agent/completions",
+        "/v1/agent/batch/completions",
         "/v1/models/available",
         "/v1/swarms/available",
+        "/v1/swarm/logs"
       ]
 
       console.log(`Updating daily metrics for ${targetDate}`)
@@ -333,6 +342,202 @@ export class SupabaseService {
         success: false,
         error: error instanceof Error ? error.message : String(error),
       }
+    }
+  }
+
+  // Store performance metrics
+  static async storePerformanceMetrics(metrics: PerformanceMetrics): Promise<boolean> {
+    if (!isSupabaseAvailable()) {
+      console.log("Supabase not available - performance metrics not stored")
+      return false
+    }
+
+    try {
+      // Validate required fields
+      const requiredFields = ["timestamp", "endpoint_path", "response_time_ms"]
+      const missingFields = requiredFields.filter((field) => {
+        const value = metrics[field as keyof PerformanceMetrics]
+        return value === undefined || value === null
+      })
+
+      if (missingFields.length > 0) {
+        console.error("Missing required fields in performance metrics:", missingFields)
+        return false
+      }
+
+      // Clean the data before sending
+      const cleanMetrics = {
+        timestamp: metrics.timestamp,
+        endpoint_path: metrics.endpoint_path,
+        response_time_ms: Math.round(metrics.response_time_ms),
+        token_usage: metrics.token_usage,
+        cost_usd: metrics.cost_usd,
+        model_name: metrics.model_name,
+        batch_size: metrics.batch_size,
+        concurrent_requests: metrics.concurrent_requests,
+        memory_usage_mb: metrics.memory_usage_mb,
+        cpu_usage_percent: metrics.cpu_usage_percent
+      }
+
+      const { error } = await supabase!.from("performance_metrics").insert([cleanMetrics]).select()
+
+      if (error) {
+        console.error("Error storing performance metrics:", error)
+        return false
+      }
+
+      return true
+    } catch (error) {
+      console.error("Exception storing performance metrics:", error)
+      return false
+    }
+  }
+
+  // Store request log
+  static async storeRequestLog(log: RequestLog): Promise<boolean> {
+    if (!isSupabaseAvailable()) {
+      console.log("Supabase not available - request log not stored")
+      return false
+    }
+
+    try {
+      // Validate required fields
+      const requiredFields = ["timestamp", "endpoint_path", "method", "response_time_ms"]
+      const missingFields = requiredFields.filter((field) => {
+        const value = log[field as keyof RequestLog]
+        return value === undefined || value === null
+      })
+
+      if (missingFields.length > 0) {
+        console.error("Missing required fields in request log:", missingFields)
+        return false
+      }
+
+      // Clean the data before sending
+      const cleanLog = {
+        timestamp: log.timestamp,
+        endpoint_path: log.endpoint_path,
+        method: log.method,
+        request_headers: log.request_headers,
+        request_body: log.request_body,
+        response_headers: log.response_headers,
+        response_body: log.response_body,
+        response_time_ms: Math.round(log.response_time_ms),
+        http_status_code: log.http_status_code,
+        error_message: log.error_message,
+        client_ip: log.client_ip,
+        user_agent: log.user_agent
+      }
+
+      const { error } = await supabase!.from("request_logs").insert([cleanLog]).select()
+
+      if (error) {
+        console.error("Error storing request log:", error)
+        return false
+      }
+
+      return true
+    } catch (error) {
+      console.error("Exception storing request log:", error)
+      return false
+    }
+  }
+
+  // Get request logs for a specific endpoint
+  static async getRequestLogs(endpointPath: string, limit = 100): Promise<RequestLog[]> {
+    if (!isSupabaseAvailable()) {
+      return []
+    }
+
+    try {
+      const { data, error } = await supabase!
+        .from("request_logs")
+        .select("*")
+        .eq("endpoint_path", endpointPath)
+        .order("timestamp", { ascending: false })
+        .limit(limit)
+
+      if (error) throw error
+      return data || []
+    } catch (error) {
+      console.error("Error fetching request logs:", error)
+      return []
+    }
+  }
+
+  // Get detailed performance metrics
+  static async getDetailedPerformanceMetrics(endpointPath: string, hours = 24): Promise<PerformanceMetrics[]> {
+    if (!isSupabaseAvailable()) {
+      return []
+    }
+
+    try {
+      const startTime = new Date()
+      startTime.setHours(startTime.getHours() - hours)
+
+      const { data, error } = await supabase!
+        .from("performance_metrics")
+        .select("*")
+        .eq("endpoint_path", endpointPath)
+        .gte("timestamp", startTime.toISOString())
+        .order("timestamp", { ascending: false })
+
+      if (error) throw error
+      return data || []
+    } catch (error) {
+      console.error("Error fetching detailed performance metrics:", error)
+      return []
+    }
+  }
+
+  // Get model-specific performance metrics
+  static async getModelPerformanceMetrics(modelName: string, hours = 24): Promise<PerformanceMetrics[]> {
+    if (!isSupabaseAvailable()) {
+      return []
+    }
+
+    try {
+      const startTime = new Date()
+      startTime.setHours(startTime.getHours() - hours)
+
+      const { data, error } = await supabase!
+        .from("performance_metrics")
+        .select("*")
+        .eq("model_name", modelName)
+        .gte("timestamp", startTime.toISOString())
+        .order("timestamp", { ascending: false })
+
+      if (error) throw error
+      return data || []
+    } catch (error) {
+      console.error("Error fetching model performance metrics:", error)
+      return []
+    }
+  }
+
+  // Get system resource usage
+  static async getSystemResourceUsage(hours = 24): Promise<SystemResourceUsage[]> {
+    if (!isSupabaseAvailable()) {
+      return []
+    }
+
+    try {
+      const startTime = new Date()
+      startTime.setHours(startTime.getHours() - hours)
+
+      const { data, error } = await supabase!
+        .from("performance_metrics")
+        .select("timestamp, memory_usage_mb, cpu_usage_percent")
+        .not("memory_usage_mb", "is", null)
+        .not("cpu_usage_percent", "is", null)
+        .gte("timestamp", startTime.toISOString())
+        .order("timestamp", { ascending: false })
+
+      if (error) throw error
+      return data || []
+    } catch (error) {
+      console.error("Error fetching system resource usage:", error)
+      return []
     }
   }
 }
