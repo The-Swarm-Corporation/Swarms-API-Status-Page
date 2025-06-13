@@ -2,7 +2,7 @@
 
 import { CheckCircle, AlertTriangle, XCircle, Clock, Database } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
-import RefreshButton from "./refresh-button"
+// import RefreshButton from "./refresh-button"
 import SupabaseStatus from "./supabase-status"
 import { useRealTime } from "./real-time-provider"
 import { useState, useEffect } from "react"
@@ -41,7 +41,7 @@ export default function StatusOverview() {
             <div className="flex flex-col items-center md:items-end space-y-2">
               <div className="text-4xl font-bold text-white">—</div>
               <div className="text-sm text-gray-400">Error loading data</div>
-              <RefreshButton />
+              {/* <RefreshButton /> */}
             </div>
           </div>
         </CardContent>
@@ -69,7 +69,7 @@ export default function StatusOverview() {
             <div className="flex flex-col items-center md:items-end space-y-2">
               <div className="text-4xl font-bold text-white">—</div>
               <div className="text-sm text-gray-400">No data yet</div>
-              <RefreshButton />
+              {/* <RefreshButton /> */}
             </div>
           </div>
         </CardContent>
@@ -119,7 +119,7 @@ export default function StatusOverview() {
           <div className="flex flex-col items-center md:items-end space-y-2">
             <div className="text-4xl font-bold text-white">{uptime > 0 ? `${uptime.toFixed(2)}%` : "—"}</div>
             <div className="text-sm text-gray-400">{uptime > 0 ? "Current Uptime" : "No data yet"}</div>
-            <RefreshButton />
+            {/* <RefreshButton /> */}
           </div>
         </div>
       </CardContent>

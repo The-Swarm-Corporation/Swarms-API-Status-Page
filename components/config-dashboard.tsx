@@ -70,6 +70,7 @@ export default function ConfigDashboard() {
             <Settings className="h-5 w-5 text-red-600" />
             <CardTitle className="text-xl font-semibold">Public Status</CardTitle>
           </div>
+          {/* 
           <Button
             variant="outline"
             size="sm"
@@ -79,7 +80,8 @@ export default function ConfigDashboard() {
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
             Refresh
-          </Button>
+          </Button> 
+          */}
         </div>
       </CardHeader>
       <CardContent className="p-6">
