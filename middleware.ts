@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import { get } from "@vercel/edge-config"
 import { SupabaseService } from "@/lib/supabase-service"
 import { isSupabaseAvailable } from "@/lib/supabase"
 
