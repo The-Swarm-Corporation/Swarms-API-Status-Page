@@ -1,8 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Badge } from "@/components/ui/badge"
-import { Database, AlertTriangle, CheckCircle } from "lucide-react"
 import { isSupabaseAvailable } from "@/lib/supabase"
 import { supabase } from "@/lib/supabase"
 
@@ -36,11 +34,16 @@ export default function SupabaseStatus() {
         }
       }
 
-      setSupabaseStatus({
+      const status = {
         available: available && !error,
         checked: true,
         error,
-      })
+      }
+
+      setSupabaseStatus(status)
+
+      // Log the status to the console
+      console.log("Supabase Status:", status)
     }
 
     checkSupabase()
@@ -50,23 +53,5 @@ export default function SupabaseStatus() {
     return null
   }
 
-  return (
-    <div className="flex items-center gap-2 text-sm">
-      <Database className="h-4 w-4 text-gray-400" />
-      <span className="text-gray-400">Database:</span>
-      {supabaseStatus.available ? (
-        <Badge variant="outline" className="border-green-600 text-green-400">
-          <CheckCircle className="h-3 w-3 mr-1" />
-          Supabase Connected
-        </Badge>
-      ) : (
-        <Badge variant="outline" className="border-yellow-600 text-yellow-400">
-          <AlertTriangle className="h-3 w-3 mr-1" />
-          {supabaseStatus.error ? "Connection Error" : "Not Configured"}
-        </Badge>
-      )}
-
-      {supabaseStatus.error && <span className="text-xs text-red-400 ml-2">{supabaseStatus.error}</span>}
-    </div>
-  )
+  return null // No UI elements are rendered
 }
