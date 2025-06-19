@@ -1,11 +1,9 @@
 import { Suspense } from "react"
 import StatusHeader from "@/components/status-header"
-import StatusOverview from "@/components/status-overview"
-import StatusMetrics from "@/components/status-metrics"
-import StatusEndpoints from "@/components/status-endpoints"
 import StatusFooter from "@/components/status-footer"
 import StatusIndicator from "@/components/status-indicator"
 import SetupGuide from "@/components/setup-guide"
+import StatusPageClient from "@/components/status-page-client"
 import { Loader2 } from "lucide-react"
 import StatusDashboard from "@/components/status-dashboard"
 import { isSupabaseAvailable } from "@/lib/supabase"
@@ -27,22 +25,7 @@ export default async function Home() {
         {!supabaseConfigured && <SetupGuide />}
 
         <Suspense fallback={<LoadingState />}>
-          <div className="space-y-8">
-            {/* System Status Section */}
-            <section id="overview" className="bg-card rounded-lg shadow-lg">
-              <StatusOverview />
-            </section>
-
-            {/* Metrics and Endpoints Section */}
-            <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div id="metrics" className="bg-card rounded-lg shadow-lg">
-                <StatusMetrics />
-              </div>
-              <div id="endpoints" className="bg-card rounded-lg shadow-lg">
-                <StatusEndpoints />
-              </div>
-            </section>
-          </div>
+          <StatusPageClient />
         </Suspense>
 
         <StatusDashboard />
