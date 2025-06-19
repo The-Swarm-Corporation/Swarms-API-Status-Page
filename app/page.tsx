@@ -8,22 +8,9 @@ import StatusIndicator from "@/components/status-indicator"
 import SetupGuide from "@/components/setup-guide"
 import { Loader2 } from "lucide-react"
 import StatusDashboard from "@/components/status-dashboard"
-import { checkAllServices } from "@/lib/api-checker"
-import { RealTimeProvider } from "@/components/real-time-provider"
 import { isSupabaseAvailable } from "@/lib/supabase"
 
 export default async function Home() {
-  // Server-side initial check
-  let initialData = null
-  let checkError = null
-
-  try {
-    initialData = await checkAllServices()
-  } catch (error) {
-    console.error("Failed to perform initial status check:", error)
-    checkError = error instanceof Error ? error.message : "Unknown error"
-  }
-
   const supabaseConfigured = isSupabaseAvailable()
 
   return (
@@ -35,14 +22,6 @@ export default async function Home() {
         <div className="flex justify-center">
           <StatusIndicator />
         </div>
-
-        {/* Error message if initial check failed */}
-        {checkError && (
-          <div className="p-4 border border-red-600 bg-red-900/20 rounded-lg">
-            <p className="text-red-400">Error during initial status check: {checkError}</p>
-            <p className="text-sm text-red-300 mt-2">The application will continue to function with limited data.</p>
-          </div>
-        )}
 
         {/* Setup guide - show if Supabase is not configured */}
         {!supabaseConfigured && <SetupGuide />}

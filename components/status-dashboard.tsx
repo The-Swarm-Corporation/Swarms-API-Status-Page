@@ -31,7 +31,7 @@ export default function StatusDashboard() {
     <div className="space-y-6 mt-8">
       <div>
         <h2 className="text-2xl font-bold mb-2">Service Status History</h2>
-        <p className="text-gray-400 mb-6">Real-time status monitoring for Swarms API endpoints</p>
+        <p className="text-gray-400 mb-6">Historical status data from cron job monitoring for Swarms API endpoints</p>
       </div>
 
       <div className="space-y-4">
