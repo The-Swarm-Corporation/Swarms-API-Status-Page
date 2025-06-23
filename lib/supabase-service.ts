@@ -76,6 +76,31 @@ export class SupabaseService {
     }
   }
 
+  // Get daily metrics for multiple endpoints efficiently
+  static async getDailyMetricsForEndpoints(endpointPaths: string[], days = 1): Promise<DailyMetrics[]> {
+    if (!isSupabaseAvailable() || endpointPaths.length === 0) {
+      return []
+    }
+
+    try {
+      const startDate = new Date()
+      startDate.setDate(startDate.getDate() - days)
+
+      const { data, error } = await supabase!
+        .from("daily_metrics")
+        .select("*")
+        .in("endpoint_path", endpointPaths)
+        .gte("date", startDate.toISOString().split("T")[0])
+        .order("date", { ascending: false })
+
+      if (error) throw error
+      return data || []
+    } catch (error) {
+      console.error("Error fetching daily metrics for multiple endpoints:", error)
+      return []
+    }
+  }
+
   // Calculate uptime for a specific period
   static async calculateUptime(endpointPath: string, days = 7): Promise<number> {
     if (!isSupabaseAvailable()) {

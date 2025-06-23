@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Monitor API
         run: |
-          curl -X POST "${{ secrets.VERCEL_DEPLOYMENT_URL }}/api/monitor" \
+          curl -L -X POST "https://status.swarms.ai/api/monitor" \
             -H "Authorization: Bearer ${{ secrets.MONITORING_CRON_SECRET }}" \
             -H "Content-Type: application/json" \
             --fail-with-body || echo "Monitoring request failed"

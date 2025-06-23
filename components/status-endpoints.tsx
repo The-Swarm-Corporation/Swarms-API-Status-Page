@@ -2,12 +2,39 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle, AlertTriangle, XCircle, AlertCircle } from "lucide-react"
-import { useRealTime } from "./real-time-provider"
+import { useState, useEffect } from "react"
+import { SupabaseService } from "@/lib/supabase-service"
 
 export default function StatusEndpoints() {
-  const { statusData } = useRealTime()
+  const [endpoints, setEndpoints] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-  if (!statusData) {
+  useEffect(() => {
+    const fetchEndpoints = async () => {
+      setLoading(true)
+      try {
+        const latestStatus = await SupabaseService.getLatestStatus()
+        
+        const endpointsData = latestStatus.map((status) => ({
+          path: status.endpoint_path,
+          description: status.endpoint_name,
+          status: status.status,
+          latency: status.response_time_ms,
+          error: status.error_message,
+        }))
+
+        setEndpoints(endpointsData)
+      } catch (error) {
+        console.error("Failed to fetch endpoints:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchEndpoints()
+  }, [])
+
+  if (loading) {
     return (
       <Card className="border-gray-800 bg-gray-900/50 backdrop-blur-sm">
         <CardHeader className="border-b border-gray-800">
@@ -20,13 +47,18 @@ export default function StatusEndpoints() {
     )
   }
 
-  const endpoints = statusData.services.map((service) => ({
-    path: service.url.replace("https://api.swarms.world", ""),
-    description: service.name,
-    status: service.status === "up" ? "operational" : "outage",
-    latency: service.responseTime,
-    error: service.error,
-  }))
+  if (endpoints.length === 0) {
+    return (
+      <Card className="border-gray-800 bg-gray-900/50 backdrop-blur-sm">
+        <CardHeader className="border-b border-gray-800">
+          <CardTitle className="text-xl font-semibold">API Endpoints</CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="text-center text-gray-400">No endpoint data available</div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card className="border-gray-800 bg-gray-900/50 backdrop-blur-sm">

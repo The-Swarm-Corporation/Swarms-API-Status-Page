@@ -2,33 +2,12 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { CheckCircle, XCircle, Database, Key, TestTube } from "lucide-react"
+import { CheckCircle, XCircle, Database, Key } from "lucide-react"
 import { isSupabaseAvailable } from "@/lib/supabase"
-import { useState } from "react"
 
 export default function SetupGuide() {
-  const [testResult, setTestResult] = useState<any>(null)
-  const [testing, setTesting] = useState(false)
-
   const supabaseAvailable = isSupabaseAvailable()
   const swarmsApiKey = !!process.env.SWARMS_API_KEY
-
-  const runSupabaseTest = async () => {
-    setTesting(true)
-    try {
-      const response = await fetch("/api/test-supabase")
-      const result = await response.json()
-      setTestResult(result)
-    } catch (error) {
-      setTestResult({
-        success: false,
-        error: error instanceof Error ? error.message : "Test failed",
-      })
-    } finally {
-      setTesting(false)
-    }
-  }
 
   const setupItems = [
     {
@@ -88,41 +67,6 @@ export default function SetupGuide() {
               </div>
             )
           })}
-
-          {/* Supabase Test Section */}
-          {supabaseAvailable && (
-            <div className="p-3 border border-gray-800 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <TestTube className="h-4 w-4 text-blue-400" />
-                  <span className="font-medium">Database Connection Test</span>
-                </div>
-                <Button
-                  onClick={runSupabaseTest}
-                  disabled={testing}
-                  size="sm"
-                  variant="outline"
-                  className="border-gray-700"
-                >
-                  {testing ? "Testing..." : "Test Connection"}
-                </Button>
-              </div>
-
-              {testResult && (
-                <div className="mt-2 p-2 bg-gray-800/50 rounded text-xs">
-                  <div className={`font-medium ${testResult.success ? "text-green-400" : "text-red-400"}`}>
-                    {testResult.success ? "✅ Test Passed" : "❌ Test Failed"}
-                  </div>
-                  {testResult.error && <div className="text-red-400 mt-1">Error: {testResult.error}</div>}
-                  {testResult.storeTest && (
-                    <div className="text-gray-400 mt-1">
-                      Store test: {testResult.storeTest.success ? "✅ Success" : "❌ Failed"}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
         {!allRequired && (

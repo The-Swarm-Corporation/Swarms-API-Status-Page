@@ -1,6 +1,5 @@
 import { Terminal, Github, ExternalLink, Activity } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { LiveIndicator } from "./live-indicator"
 
 export default function Navbar() {
   return (
@@ -15,7 +14,6 @@ export default function Navbar() {
                 Swarms API <span className="text-red-600">Status</span>
               </span>
             </div>
-            <LiveIndicator className="hidden md:flex" />
           </div>
 
           {/* Navigation Links */}
