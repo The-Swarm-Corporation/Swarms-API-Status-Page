@@ -112,77 +112,11 @@ const SERVICES: ServiceConfig[] = [
           }
         ],
         max_loops: 1,
-        swarm_type: "auto",
+        swarm_type: "SequentialWorkflow",
         task: "Respond with 'Batch test 1 successful' to confirm batch processing.",
         output_type: "dict"
       }
     ],
-  },
-  {
-    id: "agent-completions",
-    name: "Agent Completions",
-    url: `${SWARMS_API_BASE_URL}/v1/agent/completions`,
-    method: "POST",
-    timeout: 30000,
-    expectedStatus: 200,
-    payload: {
-      agent_config: {
-        agent_name: "StatusTestAgent",
-        description: "Agent for comprehensive status monitoring",
-        system_prompt: "You are a status monitoring agent. Respond only with the exact text requested for monitoring purposes. Be concise and accurate.",
-        model_name: "gpt-4o-mini",
-        max_tokens: 100,
-        temperature: 0.1,
-        role: "worker",
-        max_loops: 1,
-        auto_generate_prompt: false
-      },
-      task: "Perform a status check and respond with 'Agent status monitoring test successful' to confirm the agent completions endpoint is operational.",
-    },
-  },
-  {
-    id: "agent-batch-completions",
-    name: "Agent Batch Completions",
-    url: `${SWARMS_API_BASE_URL}/v1/agent/batch/completions`,
-    method: "POST",
-    timeout: 45000,
-    expectedStatus: 200,
-    payload: [
-      {
-        agent_config: {
-          agent_name: "BatchTestAgent1",
-          description: "First batch test agent",
-          system_prompt: "You are a batch test agent. Respond only with the exact text requested.",
-          model_name: "gpt-4o-mini",
-          max_tokens: 50,
-          temperature: 0.1,
-          role: "worker",
-          max_loops: 1,
-        },
-        task: "Respond with 'Agent batch test 1 successful' and nothing else.",
-      },
-      {
-        agent_config: {
-          agent_name: "BatchTestAgent2",
-          description: "Second batch test agent",
-          system_prompt: "You are a batch test agent. Respond only with the exact text requested.",
-          model_name: "gpt-4o-mini",
-          max_tokens: 50,
-          temperature: 0.1,
-          role: "worker",
-          max_loops: 1,
-        },
-        task: "Respond with 'Agent batch test 2 successful' and nothing else.",
-      },
-    ],
-  },
-  {
-    id: "models-available",
-    name: "Available Models",
-    url: `${SWARMS_API_BASE_URL}/v1/models/available`,
-    method: "GET",
-    timeout: 10000,
-    expectedStatus: 200,
   },
   {
     id: "swarms-available",
